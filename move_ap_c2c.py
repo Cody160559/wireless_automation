@@ -105,10 +105,10 @@ def process_ap(ap_name, index, total):
 
 # Read AP names from file
 try:
-    with open(r'c:\auto\aplist\testbatch.txt', 'r') as ip_add_file:
-        ap_names = [line.strip() for line in ip_add_file if line.strip()]
+    with open(r'c:\auto\aplist\testbatch.txt', 'r') as ap_list_file:
+        ap_names = [line.strip() for line in ap_list_file if line.strip()]
     if not ap_names:
-        print("No valid AP names found in the input file.")
+        print("No AP names found in the input file.")
         exit()
 except Exception as e:
     print(f"Error reading input file: {e}")
