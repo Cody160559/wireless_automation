@@ -1,0 +1,9 @@
+all:
+  children:
+    WLCs:
+      children:
+       Cisco_IOS_XE:
+          hosts:
+            10.156.127.238:
+              device_name: WLC-WHH-C5508-01
+              ansible_network_os: ios

@@ -1,0 +1,71 @@
+---
+- name: Manage WLAN on Cisco IOS XE WLC
+  hosts: all
+  gather_facts: false
+  connection: network_cli 
+
+  vars_prompt:
+    - name: "username"
+      prompt: "Enter the SSH username"
+    - name: "password"
+      prompt: "Enter the SSH password"
+      private: yes
+  vars:
+    ssid: "WHS_Guest"  # SSID to manage
+    mobility_anchors:
+      - { action: "delete", ip: "162.41.34.21" }
+      - { action: "add", ip: "162.41.34.23" }
+
+  tasks:
+    - name: Fetch WLAN summary
+      cisco.ios.ios_command:
+        commands:
+          - "show wlan summary"
+      register: wlan_summary_output
+
+    - name: Extract WLAN ID for the SSID
+      set_fact:
+        wlan_id: >-
+          {% for line in wlan_summary_output.stdout[0].split('\n') %}
+          {% if ssid in line %}
+          {{ line.split()[0] }}
+          {% endif %}
+          {% endfor %}
+
+    - name: Fail if WLAN ID is not found
+      fail:
+        msg: "WLAN ID for SSID '{{ ssid }}' not found on {{ inventory_hostname }}."
+      when: wlan_id is undefined
+
+    - name: Perform WLAN configuration
+      cisco.ios.ios_config:
+        lines:
+          - "config wlan disable {{ wlan_id }}"
+          - "config wlan mac-filtering disable {{ wlan_id }}"
+          - "config wlan nac radius disable {{ wlan_id }}"
+          - "config wlan aaa-override disable {{ wlan_id }}"
+        save_when: modified
+
+    - name: Manage mobility anchors
+      cisco.ios.ios_config:
+        with_items: "{{ mobility_anchors }}"
+        lines:
+          - "config wlan mobility anchor {{ item.action }} {{ wlan_id }} {{ item.ip }}"
+        save_when: modified
+
+    - name: Enable WLAN
+      cisco.ios.ios_config:
+        lines:
+          - "config wlan enable {{ wlan_id }}"
+        save_when: modified
+
+    - name: Show WLAN details
+      cisco.ios.ios_command:
+        commands:
+          - "show wlan {{ wlan_id }}"
+      register: wlan_details
+
+    - name: Display WLAN details
+      debug:
+        var: wlan_details.stdout
+

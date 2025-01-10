@@ -14,24 +14,24 @@ logging.basicConfig(
 
 # Source WLC credentials
 source_wlc = {
-    'host': '10.128.0.150',
+    'host': '10.128.0.151',
     'port': 22,
-    'username': 'fill this out',
-    'password': 'fillthis out ',
+    'username': 'csmith66',
+    'password': 'PassatAU2026',
     'device_type': 'cisco_ios',  # Use 'cisco_ios' for Cisco IOS-XE
 }
 
 # Target WLC credentials
 target_wlc = {
-    'host': '10.128.0.151',
+    'host': '10.128.0.150',
     'port': 22,
-    'username': 'fill this out',
-    'password': 'fillthis out ',
+    'username': 'csmith66',
+    'password': 'PassatAU2026',
     'device_type': 'cisco_ios',  # Use 'cisco_ios' for Cisco IOS-XE
 }
 
 # Target controller IP for AP verification
-TARGET_CONTROLLER_IP = "10.128.0.151"
+TARGET_CONTROLLER_IP = "10.128.0.150"
 
 # Functions for WLC operations
 def remove_secondary_controller(connection, ap_name):
@@ -105,7 +105,7 @@ def process_ap(ap_name, index, total):
 
 # Read AP names from file
 try:
-    with open(r'c:\auto\aplist\testbatch.txt', 'r') as ap_list_file:
+    with open(r'C:\Users\csmith66\Documents\Git\wireless_automation\inventory_files\testbatch.txt', 'r') as ap_list_file:
         ap_names = [line.strip() for line in ap_list_file if line.strip()]
     if not ap_names:
         print("No AP names found in the input file.")
