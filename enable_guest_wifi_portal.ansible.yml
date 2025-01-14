@@ -34,10 +34,7 @@
           {{ line }}
           {% endif %}
           {% endfor %}
-    - name: Debug the relevant_line
-      debug:
-      var: relevant_line
-
+    
     - name: Fail if we can't find a matching line
       fail:
         msg: "Could not find SSID '{{ ssid }}' in 'show wlan summary' output on {{ inventory_hostname }}."
