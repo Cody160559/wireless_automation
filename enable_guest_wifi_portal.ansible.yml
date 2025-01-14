@@ -1,5 +1,5 @@
 ---
-- name: Manage WLAN on Cisco IOS XE WLC
+- name: Manage WLAN on Cisco Catalyst 9800 WLC (fully dynamic)
   hosts: all
   gather_facts: false
   connection: network_cli
@@ -11,8 +11,9 @@
       prompt: "Enter the SSH password"
       private: yes
 
+  # "ssid" is the string we'll look for in "show wlan summary" to identify the row
   vars:
-    ssid: "WHS_Guest"  # SSID to manage
+    ssid: "WHS_Guest"
     mobility_anchors:
       - { action: "delete", ip: "162.41.34.21" }
       - { action: "add",    ip: "162.41.34.23" }
@@ -24,56 +25,70 @@
           - "show wlan summary"
       register: wlan_summary_output
 
-    - name: Extract WLAN ID for the SSID
+    - name: Find the line containing our SSID
+      # We'll store the entire line that has "WHS_Guest" in it (or whatever your 'ssid' var is).
       set_fact:
-        wlan_id: >-
+        relevant_line: >-
           {% for line in wlan_summary_output.stdout[0].split('\n') %}
           {% if ssid in line %}
-          {{ line.split()[0] }}
+          {{ line }}
           {% endif %}
           {% endfor %}
 
-    - name: Fail if WLAN ID is not found
+    - name: Fail if we can't find a matching line
       fail:
-        msg: "WLAN ID for SSID '{{ ssid }}' not found on {{ inventory_hostname }}."
-      when: wlan_id is undefined
+        msg: "Could not find SSID '{{ ssid }}' in 'show wlan summary' output on {{ inventory_hostname }}."
+      when: relevant_line is undefined or relevant_line == ""
 
-    - name: Perform WLAN configuration (disable, remove security, etc.)
+    - name: Parse the WLAN ID and Policy Profile from the relevant line
+      set_fact:
+        # Adjust split indices to match your actual column positions
+        # e.g. relevant_line.split()[0], [1], [2], etc.
+        wlan_id: "{{ relevant_line.split()[0] }}"
+        # If the SSID (WHS_Guest) is in index [1], then the policy profile might be in index [2], etc.
+        # This is only an example. Adjust carefully to match your environment.
+        policy_profile: "{{ relevant_line.split()[2] }}"
+
+    - name: Debug the discovered wlan_id and policy_profile
+      debug:
+        msg:
+          - "Discovered WLAN ID: {{ wlan_id }}"
+          - "Discovered Policy Profile: {{ policy_profile }}"
+
+    - name: Disable and update WLAN configuration
       cisco.ios.ios_config:
-        # Enter WLAN sub-mode on 9800 using "wlan <NAME> <ID> <SSID>".
+        # On 9800, the syntax is typically:
+        # wlan <policy_profile> <wlan_id> <SSID>
         parents:
-          - "wlan {{ ssid }} {{ wlan_id }} {{ ssid }}"
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
         lines:
-          - "shutdown"                              # Equivalent to disabling the WLAN
-          - "no security wpa psk set-key ascii 0"   # Example: remove WPA PSK
-          - "no security ft over-the-air"           # Example: remove Fast Transition
-          - "no security web-auth parameter-map"    # Example: remove WebAuth
-          # Add or remove additional lines as needed, e.g.:
-          # - "no security dot1x authentication-list <LIST_NAME>"
-          # - "no security wpa psk set-key ascii 7 <ENCRYPTED_KEY>"
+          - "shutdown"
+          # Example: removing certain security features
+          - "no security wpa psk set-key ascii 0"
+          - "no security web-auth parameter-map"
+          - "no security ft over-the-air"
         save_when: modified
 
     - name: Manage mobility anchors
       cisco.ios.ios_config:
         with_items: "{{ mobility_anchors }}"
         parents:
-          - "wlan {{ ssid }} {{ wlan_id }} {{ ssid }}"
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
         lines:
-          # On 9800, you typically use "mobility anchor <IP> <add|delete>" in sub-mode
           - "mobility anchor {{ item.ip }} {{ item.action }}"
         save_when: modified
 
-    - name: Enable WLAN
+    - name: Re-enable the WLAN
       cisco.ios.ios_config:
         parents:
-          - "wlan {{ ssid }} {{ wlan_id }} {{ ssid }}"
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
         lines:
-          - "no shutdown"     # Re-enable WLAN on 9800
+          - "no shutdown"
         save_when: modified
 
     - name: Show WLAN details
       cisco.ios.ios_command:
-        # On 9800, you can use either "show wlan id <ID>" or "show wlan name <NAME>"
+        # Alternatively: "show wlan id {{ wlan_id }}" or "show wlan name {{ ssid }}"
         commands:
           - "show wlan name {{ ssid }}"
       register: wlan_details
