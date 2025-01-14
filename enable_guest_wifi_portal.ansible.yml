@@ -65,8 +65,8 @@
         parents:
           - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
         lines:
-          - "no mobility anchor 162.41.34.23"
-          - "mobility anchor 162.41.34.21"
+          - "no mobility anchor 162.41.34.24"
+          - "mobility anchor 162.41.34.22"
         save_when: modified
 
     - name: Re-enable the WLAN
