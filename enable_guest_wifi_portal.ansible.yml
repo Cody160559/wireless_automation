@@ -2,7 +2,7 @@
 - name: Manage WLAN on Cisco IOS XE WLC
   hosts: all
   gather_facts: false
-  connection: network_cli 
+  connection: network_cli
 
   vars_prompt:
     - name: "username"
@@ -10,11 +10,12 @@
     - name: "password"
       prompt: "Enter the SSH password"
       private: yes
+
   vars:
     ssid: "WHS_Guest"  # SSID to manage
     mobility_anchors:
       - { action: "delete", ip: "162.41.34.21" }
-      - { action: "add", ip: "162.41.34.23" }
+      - { action: "add",    ip: "162.41.34.23" }
 
   tasks:
     - name: Fetch WLAN summary
@@ -37,35 +38,46 @@
         msg: "WLAN ID for SSID '{{ ssid }}' not found on {{ inventory_hostname }}."
       when: wlan_id is undefined
 
-    - name: Perform WLAN configuration
+    - name: Perform WLAN configuration (disable, remove security, etc.)
       cisco.ios.ios_config:
+        # Enter WLAN sub-mode on 9800 using "wlan <NAME> <ID> <SSID>".
+        parents:
+          - "wlan {{ ssid }} {{ wlan_id }} {{ ssid }}"
         lines:
-          - "config wlan disable {{ wlan_id }}"
-          - "config wlan mac-filtering disable {{ wlan_id }}"
-          - "config wlan nac radius disable {{ wlan_id }}"
-          - "config wlan aaa-override disable {{ wlan_id }}"
+          - "shutdown"                              # Equivalent to disabling the WLAN
+          - "no security wpa psk set-key ascii 0"   # Example: remove WPA PSK
+          - "no security ft over-the-air"           # Example: remove Fast Transition
+          - "no security web-auth parameter-map"    # Example: remove WebAuth
+          # Add or remove additional lines as needed, e.g.:
+          # - "no security dot1x authentication-list <LIST_NAME>"
+          # - "no security wpa psk set-key ascii 7 <ENCRYPTED_KEY>"
         save_when: modified
 
     - name: Manage mobility anchors
       cisco.ios.ios_config:
         with_items: "{{ mobility_anchors }}"
+        parents:
+          - "wlan {{ ssid }} {{ wlan_id }} {{ ssid }}"
         lines:
-          - "config wlan mobility anchor {{ item.action }} {{ wlan_id }} {{ item.ip }}"
+          # On 9800, you typically use "mobility anchor <IP> <add|delete>" in sub-mode
+          - "mobility anchor {{ item.ip }} {{ item.action }}"
         save_when: modified
 
     - name: Enable WLAN
       cisco.ios.ios_config:
+        parents:
+          - "wlan {{ ssid }} {{ wlan_id }} {{ ssid }}"
         lines:
-          - "config wlan enable {{ wlan_id }}"
+          - "no shutdown"     # Re-enable WLAN on 9800
         save_when: modified
 
     - name: Show WLAN details
       cisco.ios.ios_command:
+        # On 9800, you can use either "show wlan id <ID>" or "show wlan name <NAME>"
         commands:
-          - "show wlan {{ wlan_id }}"
+          - "show wlan name {{ ssid }}"
       register: wlan_details
 
     - name: Display WLAN details
       debug:
         var: wlan_details.stdout
-
