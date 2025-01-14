@@ -42,12 +42,15 @@
 
     - name: Parse the WLAN ID and Policy Profile from the relevant line
       set_fact:
-        # Adjust split indices to match your actual column positions
-        # e.g. relevant_line.split()[0], [1], [2], etc.
-        wlan_id: "{{ relevant_line.split()[0] }}"
-        # If the SSID (WHS_Guest) is in index [1], then the policy profile might be in index [2], etc.
-        # This is only an example. Adjust carefully to match your environment.
-        policy_profile: "{{ relevant_line.split()[2] }}"
+        wlan_id:        "{{ relevant_line.split()[0] }}"  # yields "22"
+        policy_profile: "{{ relevant_line.split()[1] }}"  # yields "WHS_Guest"
+
+    - name: Debug the discovered wlan_id, policy_profile, parsed_ssid
+      debug:
+        msg:
+          - "WLAN ID: {{ wlan_id }}"
+          - "Policy Profile: {{ policy_profile }}"
+          - "Parsed SSID: {{ parsed_ssid }}"
 
     - name: Debug the discovered wlan_id and policy_profile
       debug:
