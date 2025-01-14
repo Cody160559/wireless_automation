@@ -1,5 +1,5 @@
 ---
-- name: Enable Guest Portal Authentication 
+- name: Disable Guest Portal Authentication
   hosts: all
   gather_facts: false
   connection: network_cli
@@ -54,9 +54,9 @@
           - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
         lines:
           - "shutdown"
-          - "radius-server nac"
-          - "aaa-override"
-          - "security ft over-the-air"
+          - "no radius-server nac"
+          - "no aaa-override"
+          - "no security ft over-the-air"
         save_when: modified
 
     - name: Manage mobility anchors
@@ -65,8 +65,8 @@
         parents:
           - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
         lines:
-          - "no mobility anchor 162.41.34.23"
-          - "mobility anchor 162.41.34.21"
+          - "no mobility anchor 162.41.34.21"
+          - "mobility anchor 162.41.34.23"
         save_when: modified
 
     - name: Re-enable the WLAN
