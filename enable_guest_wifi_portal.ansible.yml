@@ -51,7 +51,7 @@
         msg:
           - "WLAN ID: {{ wlan_id }}"
           - "Policy Profile: {{ policy_profile }}"
-          - "Parsed SSID: {{ parsed_ssid }}"
+          - "Parsed SSID: {{ parsed_SSID }}"
 
     - name: Debug the discovered wlan_id and policy_profile
       debug:
