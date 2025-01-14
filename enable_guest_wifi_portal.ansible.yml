@@ -44,7 +44,7 @@
       set_fact:
         wlan_id:        "{{ relevant_line.split()[0] }}"  # yields "22"
         policy_profile: "{{ relevant_line.split()[1] }}"  # yields "WHS_Guest"
-        policy_SSID:    "{{ relevant_line.split()[2] }}"  # yields "WHS_Guest"
+        parsed_SSID:    "{{ relevant_line.split()[2] }}"  # yields "WHS_Guest"
 
     - name: Debug the discovered wlan_id, policy_profile, parsed_ssid
       debug:
