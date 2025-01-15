@@ -12,26 +12,30 @@ logging.basicConfig(
     filemode="w"  # Overwrite log file on each run
 )
 
+
+#Declare VARs for script
+username = input("What is your usernamename? ")
+password = input("What is your Password? ")
+SOURCE_CONTROLLER_IP = "10.128.0.150"
+TARGET_CONTROLLER_IP = "10.128.0.151"
+
 # Source WLC credentials
 source_wlc = {
-    'host': '10.128.0.151',
+    'host': SOURCE_CONTROLLER_IP,
     'port': 22,
-    'username': 'csmith66',
-    'password': 'PassatAU2026',
+    'username': username,
+    'password': password,
     'device_type': 'cisco_ios',  # Use 'cisco_ios' for Cisco IOS-XE
 }
 
 # Target WLC credentials
 target_wlc = {
-    'host': '10.128.0.150',
+    'host': TARGET_CONTROLLER_IP,
     'port': 22,
-    'username': 'csmith66',
-    'password': 'PassatAU2026',
+    'username': username,
+    'password': password,
     'device_type': 'cisco_ios',  # Use 'cisco_ios' for Cisco IOS-XE
 }
-
-# Target controller IP for AP verification
-TARGET_CONTROLLER_IP = "10.128.0.150"
 
 # Functions for WLC operations
 def remove_secondary_controller(connection, ap_name):

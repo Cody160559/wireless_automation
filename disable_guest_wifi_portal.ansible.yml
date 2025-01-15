@@ -54,27 +54,20 @@
           - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
         lines:
           - "shutdown"
-          - "no radius-server nac"
-          - "no aaa-override"
-          - "no security ft over-the-air"
+          - "no mac-filtering"
+          - "no shutdown"
         save_when: modified
 
     - name: Manage mobility anchors
       cisco.ios.ios_config:
         with_items: "{{ mobility_anchors }}"
         parents:
-          - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
+          - "wlan wireless profile policy {{ policy_profile }}"
         lines:
+          - "shutdown"
+          - "mobility anchor 162.41.34.24 priority 2"
           - "no mobility anchor 162.41.34.22"
-          - "mobility anchor 162.41.34.24"
-        save_when: modified
-
-    - name: Re-enable the WLAN
-      cisco.ios.ios_config:
-        parents:
-          - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
-        lines:
-          - "no shutdown"
+          - "no shut"
         save_when: modified
 
     - name: Show WLAN details
