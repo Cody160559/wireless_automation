@@ -53,7 +53,7 @@
         parents:
           - "wlan {{ ssid }} {{ wlan_id }} {{ policy_profile }}"
         lines:
-         - "shutdown"
+          - "shutdown"
         save_when: modified
 
     - name: Remove MAC filtering
