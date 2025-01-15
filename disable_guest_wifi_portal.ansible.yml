@@ -72,14 +72,35 @@
           - "no shutdown"
         save_when: modified
 
-    - name: Manage mobility anchors
+    - name: Shutdown Policy
       cisco.ios.ios_config:
         parents:
           - "wireless profile policy {{ policy_profile }}"
         lines:
           - "shutdown"
+        save_when: modified
+
+    - name: Add mobility anchors
+      cisco.ios.ios_config:
+        parents:
+          - "wireless profile policy {{ policy_profile }}"
+        lines:
           - "mobility anchor 162.41.34.24 priority 2"
+        save_when: modified
+
+    - name: Remove mobility anchors
+      cisco.ios.ios_config:
+        parents:
+          - "wireless profile policy {{ policy_profile }}"
+        lines:
           - "no mobility anchor 162.41.34.22"
+        save_when: modified
+
+    - name: Renable Policy
+      cisco.ios.ios_config:
+        parents:
+          - "wireless profile policy {{ policy_profile }}"
+        lines:
           - "no shutdown"
         save_when: modified
 
