@@ -60,7 +60,6 @@
 
     - name: Manage mobility anchors
       cisco.ios.ios_config:
-        with_items: "{{ mobility_anchors }}"
         parents:
           - "wlan wireless profile policy {{ policy_profile }}"
         lines:
