@@ -61,7 +61,7 @@
     - name: Manage mobility anchors
       cisco.ios.ios_config:
         parents:
-          - "wlan wireless profile policy {{ policy_profile }}"
+          - "wireless profile policy {{ policy_profile }}"
         lines:
           - "shutdown"
           - "mobility anchor 162.41.34.24 priority 2"
