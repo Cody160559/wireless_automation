@@ -48,13 +48,27 @@
           - "Policy Profile: {{ policy_profile }}"
           - "Parsed SSID: {{ parsed_SSID }}"
 
-    - name: Disable and update WLAN Secuirty configuration
+    - name: Disable WLAN
       cisco.ios.ios_config:
         parents:
-          - "wlan {{ policy_profile }} {{ wlan_id }} {{ ssid }}"
+          - "wlan {{ ssid }} {{ wlan_id }} {{ policy_profile }}"
         lines:
-          - "shutdown"
+         - "shutdown"
+        save_when: modified
+
+    - name: Remove MAC filtering
+      cisco.ios.ios_config:
+        parents:
+          - "wlan {{ ssid }} {{ wlan_id }} {{ policy_profile }}"
+        lines:
           - "no mac-filtering"
+        save_when: modified
+
+    - name: Re-enable WLAN
+      cisco.ios.ios_config:
+        parents:
+          - "wlan {{ ssid }} {{ wlan_id }} {{ policy_profile }}"
+        lines:
           - "no shutdown"
         save_when: modified
 
