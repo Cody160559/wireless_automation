@@ -51,7 +51,7 @@
     - name: Disable WLAN
       cisco.ios.ios_config:
         parents:
-          - "wlan {{ ssid }} {{ wlan_id }} {{ policy_profile }}"
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ parsed_SSID }}"
         lines:
           - "shutdown"
         save_when: modified
@@ -59,7 +59,7 @@
     - name: Remove MAC filtering
       cisco.ios.ios_config:
         parents:
-          - "wlan {{ ssid }} {{ wlan_id }} {{ policy_profile }}"
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ parsed_SSID }}"
         lines:
           - "no mac-filtering"
         save_when: modified
@@ -67,7 +67,7 @@
     - name: Re-enable WLAN
       cisco.ios.ios_config:
         parents:
-          - "wlan {{ ssid }} {{ wlan_id }} {{ policy_profile }}"
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ parsed_SSID }}"
         lines:
           - "no shutdown"
         save_when: modified
