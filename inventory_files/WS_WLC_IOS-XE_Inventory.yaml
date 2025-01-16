@@ -5,6 +5,6 @@ all:
       children:
         Cisco_IOS_XE:
           hosts:
-            10.47.0.30:
+            10.141.193.50:
               device_name: F-EHP-BA-WLC-30.whs.int
               ansible_network_os: ios
