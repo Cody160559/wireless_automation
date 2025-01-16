@@ -89,7 +89,7 @@ def main():
     password = getpass("Enter the SSH password: ")
 
     # Load the host file
-    file_path = "wlc-hosts.yaml"  # Replace with the path to your host file
+    file_path = "./inventory_files/WS_WLC_AIROS_Inventory.yaml"  # Replace with the path to your host file
     hosts_data = load_host_file(file_path)
 
     # Extract AIROS hosts
