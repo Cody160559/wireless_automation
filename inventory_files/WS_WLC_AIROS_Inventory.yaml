@@ -37,23 +37,11 @@ all:
             10.12.0.100:
               device_name: K-MDF-WLC-100
               ansible_network_os: airos
-            10.12.0.200:
-              device_name: K-WLC-C5508-Tmp1
-              ansible_network_os: airos
-            10.12.0.210:
-              device_name: K-WLC-C5508-Tmp2
-              ansible_network_os: airos
-            10.12.0.220:
-              device_name: K-WLC-C5508-TMP3
-              ansible_network_os: airos
             10.38.127.105:
               device_name: MCCDF2WLC1M
               ansible_network_os: airos
             10.35.164.11:
               device_name: NF-MDF-WLC-11
-              ansible_network_os: airos
-            10.35.164.201:
-              device_name: NF-MDF-WLC-201
               ansible_network_os: airos
             10.102.0.11:
               device_name: P-PH-0A-G4-WLC-11
@@ -79,32 +67,17 @@ all:
             10.37.164.11:
               device_name: SP-MDF-WLC-11
               ansible_network_os: airos
-            10.37.164.200:
-              device_name: SP-MDF-WLC-200
-              ansible_network_os: airos
-            10.38.200.9:
-              device_name: WGH-CDF1-WLC-9
-              ansible_network_os: airos
-            10.38.200.11:
-              device_name: WGH-MCCDF1-WLC-11
-              ansible_network_os: airos
             10.38.200.50:
               device_name: WGH-MCDDF1-WLC-50
               ansible_network_os: airos
             10.97.0.11:
               device_name: WLC-AHP-C5508-001
               ansible_network_os: airos
-            10.97.0.19:
-              device_name: WLC-AHP-C5508-002
-              ansible_network_os: airos
             10.42.0.11:
               device_name: WLC-CH-C5508-001-Pri
               ansible_network_os: airos
             10.82.0.100:
               device_name: WLC-DH-C5508-01
-              ansible_network_os: airos
-            10.92.0.100:
-              device_name: WLC-PNR-C5508-01
               ansible_network_os: airos
             10.27.0.11:
               device_name: WLC-WCO-C5508-001-Pri
