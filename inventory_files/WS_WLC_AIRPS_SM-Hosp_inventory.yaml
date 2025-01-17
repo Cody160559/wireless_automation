@@ -1,0 +1,15 @@
+all:
+  children:
+    WLCs:
+      children:
+        AIROS:
+          hosts:
+            10.52.0.100:
+              device_name: WLC-WHH-C5508-01
+              ansible_network_os: airos
+            10.35.164.11:
+              device_name: NF-MDF-WLC-11
+              ansible_network_os: airos
+            10.37.164.11:
+              device_name: SP-MDF-WLC-11
+              ansible_network_os: airos
