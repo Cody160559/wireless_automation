@@ -1,0 +1,84 @@
+all:
+  children:
+    WLCs:
+      children:
+        AIROS:
+          hosts:
+            10.52.0.100:
+              device_name: WLC-WHH-C5508-01
+              ansible_network_os: airos
+            10.88.20.50:
+              device_name: AvHP-0A-R1-WLC-50
+              ansible_network_os: airos
+            10.86.20.50:
+              device_name: CHP-0A.R4-WLC-50
+              ansible_network_os: airos
+            10.42.0.103:
+              device_name: C-MDF-WLC5508-103-Pri
+              ansible_network_os: airos
+            10.82.0.11:
+              device_name: D-WLC-MDFA-E7-11
+              ansible_network_os: airos
+            10.194.4.11:
+              device_name: F-1800-11A-R1-WLC-11
+              ansible_network_os: airos
+            10.197.2.11:
+              device_name: F-2200Thornton-1A-WLC-11
+              ansible_network_os: airos
+            10.47.0.11:
+              device_name: F-EHP-BA-R6-WLC-11
+              ansible_network_os: airos
+            10.57.0.11:
+              device_name: F-VHP-0A-R5-WLC-11
+              ansible_network_os: airos
+            10.12.0.11:
+              device_name: KH-MDF-WLC-11
+              ansible_network_os: airos
+            10.12.0.100:
+              device_name: K-MDF-WLC-100
+              ansible_network_os: airos
+            10.38.127.105:
+              device_name: MCCDF2WLC1M
+              ansible_network_os: airos
+            10.35.164.11:
+              device_name: NF-MDF-WLC-11
+              ansible_network_os: airos
+            10.102.0.11:
+              device_name: P-PH-0A-G4-WLC-11
+              ansible_network_os: airos
+            10.102.0.201:
+              device_name: P-PH-0A-temp-WLC-201
+              ansible_network_os: airos
+            10.70.20.228:
+              device_name: Q-ATL-A20-WLC-A
+              ansible_network_os: airos
+            10.70.20.229:
+              device_name: Q-ATL-B17-WLC-C-229
+              ansible_network_os: airos
+            10.70.20.230:
+              device_name: Q-ATL-B18-WLC-B
+              ansible_network_os: airos
+            10.70.21.244:
+              device_name: Q-SUW-A11-WLC-A-21-244
+              ansible_network_os: airos
+            10.70.21.245:
+              device_name: Q-SUW-B10-WLC-B-21-245
+              ansible_network_os: airos
+            10.37.164.11:
+              device_name: SP-MDF-WLC-11
+              ansible_network_os: airos
+            10.38.200.50:
+              device_name: WGH-MCDDF1-WLC-50
+              ansible_network_os: airos
+            10.97.0.11:
+              device_name: WLC-AHP-C5508-001
+              ansible_network_os: airos
+            10.42.0.11:
+              device_name: WLC-CH-C5508-001-Pri
+              ansible_network_os: airos
+            10.82.0.100:
+              device_name: WLC-DH-C5508-01
+              ansible_network_os: airos
+            10.27.0.11:
+              device_name: WLC-WCO-C5508-001-Pri
+              ansible_network_os: airos

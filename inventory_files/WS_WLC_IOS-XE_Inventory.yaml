@@ -1,0 +1,10 @@
+---
+all:
+  children:
+    WLCs:
+      children:
+        Cisco_IOS_XE:
+          hosts:
+            10.0.156.237:
+              device_name: F-EHP-BA-WLC-30.whs.int
+              ansible_network_os: ios

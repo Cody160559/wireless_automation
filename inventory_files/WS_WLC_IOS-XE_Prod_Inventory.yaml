@@ -1,0 +1,31 @@
+---
+all:
+  children:
+    WLCs:
+      children:
+        Cisco_IOS_XE:
+          hosts:
+            10.141.193.50:
+              device_name: SG-1B-9800L-50.whs.int
+              ansible_network_os: ios
+            10.141.193.30:
+              device_name: SG-1A-9800L-HA-30.whs.int
+              ansible_network_os: ios
+            10.144.188.30:
+              device_name: RWSH-MDF-WLC-30.whs.int
+              ansible_network_os: ios
+            10.144.188.21:
+              device_name: RWSH-MDF-WLC-21.whs.int
+              ansible_network_os: ios
+            10.47.0.30:
+              device_name: F-EHP-BA-WLC-30.whs.int
+              ansible_network_os: ios
+            10.141.2.21:
+              device_name: F-106OldMill-WLC-11.whs.int
+              ansible_network_os: ios
+            10.0.156.238:
+              device_name: BT2Z-9880-1.whs.int
+              ansible_network_os: ios
+            10.0.156.237:
+              device_name: BA2H-9880-1.whs.int
+              ansible_network_os: ios

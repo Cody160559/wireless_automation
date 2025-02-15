@@ -1,0 +1,54 @@
+---
+- name: Enable Guest Portal Authentication (via show aaa method-lists authorization)
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+
+  vars_prompt:
+    - name: username
+      prompt: "Enter the SSH username"
+    - name: password
+      prompt: "Enter the SSH password"
+      private: yes
+
+  tasks:
+
+    - name: Fetch AAA method-lists authorization
+      cisco.ios.ios_command:
+        commands:
+          - "show aaa method-lists authorization"
+      register: method_list_output
+
+    - name: Select the line matching 'dnac-cts-WHS_Guest'
+      set_fact:
+        guest_line: >-
+          {{ method_list_output.stdout[0].split('\n')
+            | select('search', 'name=dnac-cts-WHS_Guest')
+            | list
+            | first
+            | default('') }}
+
+    - name: Fail if we cannot find the authorization list line
+      fail:
+        msg: "Could not find any line referencing 'dnac-cts-WHS_Guest' in show aaa method-lists authorization"
+      when: guest_line == ''
+
+    - name: Parse out the raw authorization substring
+      set_fact:
+        my_auth_list: >-
+          {{ guest_line
+            | regex_findall('name=(dnac-cts-WHS_Guest-[^\\s]+)')
+            | first
+            | default('') }}
+
+    - name: Fail if my_auth_list is still empty
+      fail:
+        msg: "Unable to parse the auth list from the line: {{ guest_line }}"
+      when: my_auth_list == ''
+
+    - name: Strip everything after 'valid=TRUE' from auth list
+      set_fact:
+        my_auth_list: >-
+          {{ my_auth_list
+            | regex_replace(' *valid=TRUE.*', '')
+            | trim }}

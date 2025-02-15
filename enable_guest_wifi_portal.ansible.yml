@@ -1,0 +1,156 @@
+---
+- name: Enable Guest Portal Authentication 
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+
+  vars_prompt:
+    - name: "username"
+      prompt: "Enter the SSH username"
+    - name: "password"
+      prompt: "Enter the SSH password"
+      private: yes
+
+  vars:
+    ssid: "WHS_Guest"
+
+  tasks:
+    - name: Fetch WLAN summary
+      cisco.ios.ios_command:
+        commands:
+          - "show wlan summary"
+      register: wlan_summary_output
+
+    - name: Find the line containing our SSID
+      set_fact:
+        relevant_line: >-
+          {% for line in wlan_summary_output.stdout[0].split('\n') %}
+          {% if ssid in line %}
+          {{ line }}
+          {% endif %}
+          {% endfor %}
+    
+    - name: Fail if we can't find a matching line
+      fail:
+        msg: "Could not find SSID '{{ ssid }}' in 'show wlan summary' output on {{ inventory_hostname }}."
+      when: relevant_line is undefined or relevant_line == ""
+
+
+    - name: Parse the WLAN ID and Policy Profile from the relevant line
+      set_fact:
+        wlan_id:        "{{ relevant_line.split()[0] }}"
+        policy_profile: "{{ relevant_line.split()[1] }}"
+        parsed_SSID:    "{{ relevant_line.split()[2] }}"
+
+    - name: Debug the discovered wlan_id, policy_profile, parsed_ssid
+      debug:
+        msg:
+          - "WLAN ID: {{ wlan_id }}"
+          - "Policy Profile: {{ policy_profile }}"
+          - "Parsed SSID: {{ parsed_SSID }}"
+
+    - name: Fetch AAA method-lists authorization
+      cisco.ios.ios_command:
+        commands:
+          - "show aaa method-lists authorization"
+      register: method_list_output
+
+    - name: Select the line matching 'dnac-cts-WHS_Guest'
+      set_fact:
+        guest_line: >-
+          {{ method_list_output.stdout[0].split('\n')
+            | select('search', 'name=dnac-cts-WHS_Guest')
+            | list
+            | first
+            | default('') }}
+
+    - name: Fail if we cannot find the authorization list line
+      fail:
+        msg: "Could not find any line referencing 'dnac-cts-WHS_Guest' in show aaa method-lists authorization"
+      when: guest_line == ''
+
+    - name: Parse out the raw authorization substring
+      set_fact:
+        my_auth_list: >-
+          {{ guest_line
+            | regex_findall('name=(dnac-cts-WHS_Guest-[^\\s]+)')
+            | first
+            | default('') }}
+
+    - name: Fail if my_auth_list is still empty
+      fail:
+        msg: "Unable to parse the auth list from the line: {{ guest_line }}"
+      when: my_auth_list == ''
+
+    - name: Strip everything after 'valid=TRUE' from auth list
+      set_fact:
+        my_auth_list: >-
+          {{ my_auth_list
+            | regex_replace(' *valid=TRUE.*', '')
+            | trim }}
+
+    - name: Disable WLAN
+      cisco.ios.ios_config:
+        parents:
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ parsed_SSID }}"
+        lines:
+          - "shutdown"
+        save_when: modified
+
+    - name: Enable MAC filtering
+      cisco.ios.ios_config:
+        parents:
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ parsed_SSID }}"
+        lines:
+          - "mac-filtering {{ my_auth_list }}"
+        save_when: modified
+
+    - name: Re-enable WLAN
+      cisco.ios.ios_config:
+        parents:
+          - "wlan {{ policy_profile }} {{ wlan_id }} {{ parsed_SSID }}"
+        lines:
+          - "no shutdown"
+        save_when: modified
+
+    - name: Shutdown Policy
+      cisco.ios.ios_config:
+        parents:
+          - "wireless profile policy {{ policy_profile }}"
+        lines:
+          - "shutdown"
+        save_when: modified
+
+    - name: Add mobility anchors
+      cisco.ios.ios_config:
+        parents:
+          - "wireless profile policy {{ policy_profile }}"
+        lines:
+          - "mobility anchor 162.41.34.22 priority 1"
+        save_when: modified
+
+    - name: Remove mobility anchors
+      cisco.ios.ios_config:
+        parents:
+          - "wireless profile policy {{ policy_profile }}"
+        lines:
+          - "no mobility anchor 162.41.34.24"
+        save_when: modified
+
+    - name: Renable Policy
+      cisco.ios.ios_config:
+        parents:
+          - "wireless profile policy {{ policy_profile }}"
+        lines:
+          - "no shutdown"
+        save_when: modified
+
+    - name: Show WLAN details
+      cisco.ios.ios_command:
+        commands:
+          - "show wlan name {{ ssid }}"
+      register: wlan_details
+
+    - name: Display WLAN details
+      debug:
+        var: wlan_details.stdout
